@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="cn.txm.nsfw.complain.entity.ComplainEntity" table="complain" schema="sshproject">
+        <id name="compId" column="comp_id"/>
+        <property name="compCompany" column="comp_company"/>
+        <property name="compName" column="comp_name"/>
+        <property name="compMobile" column="comp_mobile"/>
+        <property name="isNm" column="is_NM"/>
+        <property name="compTime" column="comp_time"/>
+        <property name="compTitle" column="comp_title"/>
+        <property name="toCompName" column="to_comp_name"/>
+        <property name="toCompDept" column="to_comp_dept"/>
+        <property name="compContent" column="comp_content"/>
+        <property name="state" column="state"/>
+    </class>
+</hibernate-mapping>

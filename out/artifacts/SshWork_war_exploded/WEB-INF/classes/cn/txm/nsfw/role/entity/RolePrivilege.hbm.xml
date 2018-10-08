@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.txm.nsfw.role.entity.RolePrivilege" table="role_privilege">
+        <composite-id name="id" class="cn.txm.nsfw.role.entity.RolePrivilegeId">
+            <key-many-to-one name="role" class="cn.txm.nsfw.role.entity.Role" lazy="false">
+                <column name="role_id"/>
+            </key-many-to-one>
+            <key-property name="code" type="java.lang.String">
+                <column name="code" length="20"/>
+            </key-property>
+        </composite-id>
+
+        <!--
+            上方：
+                联合主键composite-id：在程序中通过id（name="id"）被引用，对应的类型是RolePrivilegeId
+
+                联合主键中包括两部分：
+                    key-many-to-one：引用值为role（name="role"），对应的类型是Role，数据库表中的列是role_id
+                    key-property：引用值为code（name="code"），对应的类型是String，数据库表中的列是code
+        -->
+    </class>
+</hibernate-mapping>

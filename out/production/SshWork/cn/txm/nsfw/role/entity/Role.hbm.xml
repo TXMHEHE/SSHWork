@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cn.txm.nsfw.role.entity.Role" table="role">
+        <id name="roleId" type="java.lang.String" column="role_id" length="32">
+            <generator class="uuid"/>
+        </id>
+
+        <property name="name" type="java.lang.String" column="name" length="20" not-null="true"/>
+        <property name="state" type="java.lang.String" column="state" length="1"/>
+
+        <set name="rolePrivileges" inverse="true" lazy="false" cascade="save-update,delete">
+            <!-- lazy不能为true，为什么，不知道 -->
+            <key>
+                <column name="role_id"/>    <!-- 存在于中间表的字段 -->
+            </key>
+            <one-to-many class="cn.txm.nsfw.role.entity.RolePrivilege"/>
+        </set>
+    </class>
+</hibernate-mapping>

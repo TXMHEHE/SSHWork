@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:aop="http://www.springframework.org/schema/aop"
+        xmlns:tx="http://www.springframework.org/schema/tx"
+
+        xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.springframework.org/schema/aop
+            http://www.springframework.org/schema/aop/spring-aop.xsd
+            http://www.springframework.org/schema/tx
+            http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <context:property-placeholder location="classpath:db.properties"/>
+
+    <!-- 配置c3p0数据源 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="jdbcUrl" value="${jdbcUrl}"/>
+        <property name="driverClass" value="${driverClass}"/>
+        <property name="user" value="${user}"/>
+        <property name="password" value="${password}"/>
+
+        <!-- 初始化时获取三个链接：取值应在minPoolSize和maxPoolSize之间；Default：3 -->
+        <property name="initialPoolSize" value="${initialPoolSize}"/>
+        <property name="minPoolSize" value="3"/>
+        <property name="maxPoolSize" value="${maxPoolSize}"/>
+        <property name="acquireIncrement" value="3"/>
+        <property name="maxIdleTime" value="1800"/>
+    </bean>
+
+    <!-- 创建SessionFactory -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">true</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <prop key="hibernate.connection.url">jdbc:mysql://localhost:3306/sshproject</prop>
+                <prop key="hibernate.connection.driver_class">com.mysql.jdbc.Driver</prop>
+            </props>
+        </property>
+
+        <property name="mappingLocations">
+            <list>
+                <value>classpath:cn/txm/nsfw/user/entity/User.hbm.xml</value>
+                <value>classpath:cn/txm/nsfw/role/entity/Role.hbm.xml</value>
+                <value>classpath:cn/txm/nsfw/role/entity/RolePrivilege.hbm.xml</value>
+                <value>classpath:cn/txm/nsfw/user/entity/UserRole.hbm.xml</value>
+                <value>classpath:cn/txm/nsfw/info/entity/Info.hbm.xml</value>
+                <value>classpath:cn/txm/nsfw/complain/entity/ComplainEntity.hbm.xml</value>
+                <value>classpath:cn/txm/nsfw/complain/entity/ComplainReplyEntity.hbm.xml</value>
+            </list>
+        </property>
+        <property name="annotatedClasses">
+            <list>
+                <value>cn.txm.nsfw.complain.entity.ComplainEntity</value>
+                <value>cn.txm.nsfw.complain.entity.ComplainReplyEntity</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- 所有业务dao的parent -->
+    <bean name="baseDao" abstract="true">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <!-- 权限鉴定类 -->
+    <bean id="permissionCheck" class="cn.txm.core.permission.impl.PermissionCheckImpl"/>
+
+    <!-- ==== 事务 ==== -->
+    <!--HibernateTransactionManager注册事务管理器-->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+
+    <!--注册事务通知-->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <!-- 对连接点方法上要使用的事务属性进行配置  即：使以下方法具有事务的属性，可以根据需要使用-->
+            <tx:method name="save*" isolation="DEFAULT" propagation="REQUIRED" read-only="false"/>
+            <tx:method name="update*" isolation="DEFAULT" propagation="REQUIRED" read-only="false"/>
+            <tx:method name="delete*" isolation="DEFAULT" propagation="REQUIRED" read-only="false"/>
+            <tx:method name="importExcel" isolation="DEFAULT" propagation="REQUIRED" read-only="false"/>
+            <tx:method name="find*" isolation="DEFAULT" propagation="REQUIRED" rollback-for="Throwable"/>
+            <tx:method name="get*" isolation="DEFAULT" propagation="REQUIRED" rollback-for="Throwable"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!--aop配置  即事务代理-->
+    <aop:config>
+        <!-- 指定切入点  即：在这里具体指出上面的方法中哪些需要使用事务 -->
+        <aop:pointcut expression="execution(* cn.txm..service.impl.*.*(..))" id="myPointcut"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="myPointcut"/>
+    </aop:config>
+
+
+    <import resource="classpath:cn/txm/nsfw/user/conf/user-spring.xml"/>
+    <import resource="classpath:cn/txm/nsfw/role/conf/role-spring.xml"/>
+    <import resource="classpath:cn/txm/nsfw/info/conf/info-spring.xml"/>
+    <import resource="classpath:cn/txm/nsfw/complain/conf/complain-spring.xml"/>
+
+
+    <!--
+
+    -->
+</beans>

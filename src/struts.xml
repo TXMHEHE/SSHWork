@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+    <!-- 禁用动态方法访问 -->
+    <constant name="struts.enable.DynamicMethodInvocation" value="false" />
+    <!-- 配置成开发模式 -->
+    <constant name="struts.devMode" value="true" />
+    <!-- 配置拓展名为action -->
+    <constant name="struts.action.extension" value="action"/>
+    <!-- 把主题配置成simple -->
+    <constant name="struts.ui.theme" value="simple"/>
+
+    <!-- 配置全局结果及异常映射 -->
+    <package name="base-default" extends="struts-default">
+        <!-- 返回结果类型 -->
+        <result-types>
+            <result-type name="error" class="cn.txm.core.action.SysResultAction"/>
+        </result-types>
+        <!-- 全局返回结果 -->
+        <!-- <global-results>
+             <result name="error" type="error">WEB-INF/jsp/error.jsp</result>
+             <result name="sysError">WEB-INF/jsp/error.jsp</result>
+             <result name="input">WEB-INF/jsp/error.jsp</result>
+        </global-results> -->
+
+
+        <!-- 全局异常映射 -->
+        <global-exception-mappings>
+             <exception-mapping  result="sysError" exception="cn.txm.core.exception.SysException"/>
+             <exception-mapping  result="input" exception="java.lang.Exception"/>
+        </global-exception-mappings>
+    </package>
+
+    <!-- 包含用户管理的struts配置文件 -->
+    <include file="cn/txm/nsfw/user/conf/user-struts.xml"/>
+    <include file="cn/txm/nsfw/role/conf/role-struts.xml"/>
+    <include file="cn/txm/nsfw/home/conf/home-struts.xml"/>
+    <include file="cn/txm/nsfw/info/conf/info-struts.xml"/>
+    <include file="cn/txm/nsfw/complain/conf/complain-struts.xml"/>
+    <include file="cn/txm/login/conf/login-struts.xml"/>
+    <include file="home/conf/home-struts.xml"/>
+</struts>
